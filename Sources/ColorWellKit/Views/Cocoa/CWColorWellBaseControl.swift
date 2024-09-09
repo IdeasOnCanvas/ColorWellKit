@@ -22,7 +22,7 @@ public class _CWColorWellBaseControl: NSControl {
 
         static let defaultStyle = CWColorWell.Style.default
 
-        static let defaultSize = NSSize(width: 38, height: 24)
+        static let defaultSize = NSSize(width: 38, height: 20)
 
         var color = Self.defaultColor
 
