@@ -159,7 +159,7 @@ extension CWColorWellPopover {
             super.init(frame: .zero)
             self.rowSpacing = 1
             self.columnSpacing = 1
-            setRows(with: colorWell)
+            setColumns(with: colorWell)
             updateSelectionIndicator()
         }
 
@@ -169,23 +169,23 @@ extension CWColorWellPopover {
         }
 
         @discardableResult
-        private func addSwatchRow(with swatches: [ColorSwatch]) -> NSGridRow {
-            let row = addRow(with: swatches)
+        private func addSwatchColumn(with swatches: [ColorSwatch]) -> NSGridColumn {
+            let row = addColumn(with: swatches)
             self.swatches.append(contentsOf: swatches)
             return row
         }
 
-        private func setRows(with colorWell: CWColorWell) {
+        private func setColumns(with colorWell: CWColorWell) {
             guard swatches.isEmpty else {
-                cw_log("SwatchLayout rows already set", category: .popover)
+                cw_log("SwatchLayout columns already set", category: .popover)
                 return
             }
 
             var currentSwatches = [ColorSwatch]()
 
             for color in colorWell.swatchColors {
-                if currentSwatches.count >= 6 {
-                    addSwatchRow(with: currentSwatches)
+                if currentSwatches.count >= 4 {
+                    addSwatchColumn(with: currentSwatches)
                     currentSwatches.removeAll()
                 }
                 currentSwatches.append(
@@ -199,7 +199,7 @@ extension CWColorWellPopover {
             }
 
             if !currentSwatches.isEmpty {
-                addSwatchRow(with: currentSwatches)
+                addSwatchColumn(with: currentSwatches)
             }
         }
 
