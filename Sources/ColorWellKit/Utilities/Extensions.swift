@@ -169,6 +169,33 @@ extension NSColor {
 
         return copy
     }
+
+    /// Special swatch drawing for clear color
+    func cw_drawSwatch(in rect: NSRect) {
+        if self.alphaComponent == 0.0 {
+            guard let context = NSGraphicsContext.current else {
+                self.drawSwatch(in: rect)
+                return
+            }
+
+            context.saveGraphicsState()
+            defer {
+                context.restoreGraphicsState()
+            }
+
+            context.cgContext.setFillColor(NSColor.white.cgColor)
+            context.cgContext.fill(rect)
+            context.cgContext.clip(to: rect)
+            context.cgContext.setLineWidth(2.0)
+            context.cgContext.setLineCap(.square)
+            context.cgContext.setStrokeColor(NSColor.red.cgColor)
+            context.cgContext.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            context.cgContext.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            context.cgContext.strokePath()
+        } else {
+            self.drawSwatch(in: rect)
+        }
+    }
 }
 
 // MARK: NSColorPanel

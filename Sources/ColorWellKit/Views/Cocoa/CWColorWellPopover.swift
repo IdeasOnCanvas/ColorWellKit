@@ -370,7 +370,7 @@ extension CWColorWellPopover {
             context.compositingOperation = .multiply
 
             let color = color.usingColorSpace(.displayP3) ?? color
-            color.drawSwatch(in: bounds)
+            color.cw_drawSwatch(in: bounds)
             NSColor(white: 1 - color.averageBrightness, alpha: 0.3).setStroke()
             let path = NSBezierPath(rect: bounds.insetBy(dx: 1, dy: 1))
             path.lineWidth = 2

@@ -324,7 +324,7 @@ class CWSwatchSegment: CWColorWellSegment {
             guard let displayColor else {
                 return false
             }
-            displayColor.drawSwatch(in: bounds)
+            displayColor.cw_drawSwatch(in: bounds)
             return true
         }
 
@@ -481,7 +481,7 @@ class CWBorderedSwatchSegment: CWSwatchSegment {
         clippingPath.lineWidth = 1
         clippingPath.addClip()
 
-        displayColor.drawSwatch(in: bounds)
+        displayColor.cw_drawSwatch(in: bounds)
 
         borderColor.setStroke()
         clippingPath.stroke()
