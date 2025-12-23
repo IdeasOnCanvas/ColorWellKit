@@ -126,7 +126,10 @@ struct Path {
     ) -> Path {
         // flatten the opposite edge to join up with the
         // segment on the other side
-        let flatEdge = segmentType.edge?.opposite
+        var flatEdge = segmentType.edge?.opposite
+        if NSApp.userInterfaceLayoutDirection == .rightToLeft {
+            flatEdge = segmentType.edge
+        }
         return colorWellPath(
             rect: rect,
             controlSize: controlSize,
