@@ -52,16 +52,25 @@ public class _CWColorWellBaseControl: NSControl {
 
     // MARK: Static Properties
 
+    // Slider changes on macOS 27 do not emit KVO for NSColorPanel.color.
+    // Use the panel's color-change notification for all color picker modes.
+    private static let colorPanelColorObserver: NSObjectProtocol = NotificationCenter.default.addObserver(
+        forName: NSColorPanel.colorDidChangeNotification,
+        object: NSColorPanel.shared,
+        queue: nil
+    ) { notification in
+        guard let colorPanel = notification.object as? NSColorPanel else { return }
+
+        for case let colorWell as CWColorWell in colorPanel.attachedObjects {
+            colorWell.updateColor(colorPanel.color, options: [
+                .informDelegate,
+                .informObservers,
+                .sendAction,
+            ])
+        }
+    }
+
     private static let colorPanelObservations: [NSKeyValueObservation] = [
-        NSColorPanel.shared.observe(\.color) { colorPanel, _ in
-            for case let colorWell as CWColorWell in colorPanel.attachedObjects {
-                colorWell.updateColor(colorPanel.color, options: [
-                    .informDelegate,
-                    .informObservers,
-                    .sendAction,
-                ])
-            }
-        },
         NSColorPanel.shared.observe(\.isVisible) { colorPanel, _ in
             if !colorPanel.isVisible {
                 for case let colorWell as CWColorWell in colorPanel.attachedObjects {
@@ -125,6 +134,7 @@ public class _CWColorWellBaseControl: NSControl {
             """
         )
         _ = NSColorWell.swizzler
+        _ = _CWColorWellBaseControl.colorPanelColorObserver
         _ = _CWColorWellBaseControl.colorPanelObservations
     }
 
