@@ -54,6 +54,18 @@ struct ContentView: View {
 }
 ```
 
+To offer a Clear swatch without exposing opacity adjustment, opt in to `allowsClear`:
+
+```swift
+ColorWell(selection: $color, supportsOpacity: false, allowsClear: true)
+    .colorWellStyle(.expanded)
+    .colorWellSwatchColors([.clear, .red, .green, .blue])
+```
+
+Clear remains transparent; every other color is made opaque, including translucent
+colors received from the color panel or drag and drop. The opacity slider stays
+hidden. `allowsClear` defaults to `false`, preserving existing behavior.
+
 ### Cocoa
 
 Create a `CWColorWell` using one of the available initializers, or use an `IBOutlet` to create a connection to a Storyboard or NIB file. Respond to color changes using your preferred design pattern.

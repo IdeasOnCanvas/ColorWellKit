@@ -13,10 +13,12 @@ public struct ColorWell<Label: View>: View {
 
     private let supportsOpacity: Bool
 
+    private let allowsClear: Bool
+
     private let label: Label?
 
     private var representable: some View {
-        ColorWellRepresentable(selection: $selection, supportsOpacity: supportsOpacity)
+        ColorWellRepresentable(selection: self.$selection, supportsOpacity: self.supportsOpacity, allowsClear: self.allowsClear)
             .alignmentGuide(.firstTextBaseline) { context in
                 context[VerticalAlignment.center]
             }
@@ -49,9 +51,10 @@ public struct ColorWell<Label: View>: View {
     }
 
     /// A base initializer for others to delegate to.
-    private init(selection: Binding<NSColor>, supportsOpacity: Bool, label: Label?) {
+    private init(selection: Binding<NSColor>, supportsOpacity: Bool, allowsClear: Bool, label: Label?) {
         self._selection = selection
         self.supportsOpacity = supportsOpacity
+        self.allowsClear = allowsClear
         self.label = label
     }
 }
@@ -66,10 +69,12 @@ extension ColorWell {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
     ///   - label: A view that describes the purpose of the color well.
     @available(macOS 11.0, *)
-    public init(selection: Binding<Color>, supportsOpacity: Bool = true, @ViewBuilder label: () -> Label) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: label())
+    public init(selection: Binding<Color>, supportsOpacity: Bool = true, allowsClear: Bool = false, @ViewBuilder label: () -> Label) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: label())
     }
 
     /// Creates a color well with a binding to a color value, with the provided
@@ -79,9 +84,11 @@ extension ColorWell {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
     ///   - label: A view that describes the purpose of the color well.
-    public init(selection: Binding<CGColor>, supportsOpacity: Bool = true, @ViewBuilder label: () -> Label) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: label())
+    public init(selection: Binding<CGColor>, supportsOpacity: Bool = true, allowsClear: Bool = false, @ViewBuilder label: () -> Label) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: label())
     }
 }
 
@@ -94,9 +101,11 @@ extension ColorWell where Label == Never {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
     @available(macOS 11.0, *)
-    public init(selection: Binding<Color>, supportsOpacity: Bool = true) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: nil)
+    public init(selection: Binding<Color>, supportsOpacity: Bool = true, allowsClear: Bool = false) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: nil)
     }
 
     /// Creates a color well with a binding to a color value.
@@ -105,8 +114,10 @@ extension ColorWell where Label == Never {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
-    public init(selection: Binding<CGColor>, supportsOpacity: Bool = true) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: nil)
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
+    public init(selection: Binding<CGColor>, supportsOpacity: Bool = true, allowsClear: Bool = false) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: nil)
     }
 }
 
@@ -124,9 +135,11 @@ extension ColorWell where Label == Text {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
     @available(macOS 11.0, *)
-    public init<S: StringProtocol>(_ title: S, selection: Binding<Color>, supportsOpacity: Bool = true) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: Text(title))
+    public init<S: StringProtocol>(_ title: S, selection: Binding<Color>, supportsOpacity: Bool = true, allowsClear: Bool = false) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: Text(title))
     }
 
     /// Creates a color well with a binding to a color value, that generates its
@@ -137,8 +150,10 @@ extension ColorWell where Label == Text {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
-    public init<S: StringProtocol>(_ title: S, selection: Binding<CGColor>, supportsOpacity: Bool = true) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: Text(title))
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
+    public init<S: StringProtocol>(_ title: S, selection: Binding<CGColor>, supportsOpacity: Bool = true, allowsClear: Bool = false) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: Text(title))
     }
 
     // MARK: Generate Label From LocalizedStringKey
@@ -151,9 +166,11 @@ extension ColorWell where Label == Text {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
     @available(macOS 11.0, *)
-    public init(_ titleKey: LocalizedStringKey, selection: Binding<Color>, supportsOpacity: Bool = true) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: Text(titleKey))
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<Color>, supportsOpacity: Bool = true, allowsClear: Bool = false) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: Text(titleKey))
     }
 
     /// Creates a color well with a binding to a color value, that generates its
@@ -164,8 +181,10 @@ extension ColorWell where Label == Text {
     ///   - selection: A binding to the color well's color.
     ///   - supportsOpacity: A Boolean value that indicates whether the color well
     ///     allows adjusting the selected color's opacity; the default is `true`.
-    public init(_ titleKey: LocalizedStringKey, selection: Binding<CGColor>, supportsOpacity: Bool = true) {
-        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, label: Text(titleKey))
+    ///   - allowsClear: Whether the clear color remains transparent when opacity
+    ///     is disabled. All other colors become opaque. The default is `false`.
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<CGColor>, supportsOpacity: Bool = true, allowsClear: Bool = false) {
+        self.init(selection: selection.nsColor, supportsOpacity: supportsOpacity, allowsClear: allowsClear, label: Text(titleKey))
     }
 }
 #endif

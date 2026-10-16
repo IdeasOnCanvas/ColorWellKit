@@ -18,6 +18,12 @@ struct ColorWellRepresentable: NSViewRepresentable {
             }
         }
 
+        var allowsClear: Bool = false {
+            didSet {
+                self.updateColor(self.color, options: [])
+            }
+        }
+
         func segment(at point: NSPoint) -> CWColorWellSegment? {
             layoutView.segments.first { segment in
                 segment.frameConvertedToWindow.contains(point)
@@ -32,9 +38,10 @@ struct ColorWellRepresentable: NSViewRepresentable {
                 super.updateColor(nil, options: options)
                 return
             }
-            if supportsOpacity || newColor.alphaComponent == 1 {
-                // color well either supports opacity, or the new color is
-                // already opaque; pass through to super
+            let isAllowedClear = self.allowsClear && newColor.resembles(.clear, tolerance: 0)
+            if supportsOpacity || newColor.alphaComponent == 1 || isAllowedClear {
+                // Clear can represent a reset without enabling opacity adjustment.
+                // All other colors still follow supportsOpacity.
                 super.updateColor(newColor, options: options)
             } else {
                 let opaqueColor = newColor.withAlphaComponent(1)
@@ -128,10 +135,12 @@ struct ColorWellRepresentable: NSViewRepresentable {
     @Binding var selection: NSColor
 
     let supportsOpacity: Bool
+    var allowsClear: Bool = false
 
     func makeNSView(context: Context) -> BridgedColorWell {
         let colorWell = BridgedColorWell(color: selection)
 
+        colorWell.allowsClear = self.allowsClear
         colorWell.supportsOpacity = supportsOpacity
         colorWell.delegate = context.coordinator
 
@@ -172,6 +181,9 @@ struct ColorWellRepresentable: NSViewRepresentable {
     }
 
     func updateNSView(_ colorWell: BridgedColorWell, context: Context) {
+        if colorWell.allowsClear != self.allowsClear {
+            colorWell.allowsClear = self.allowsClear
+        }
         if colorWell.supportsOpacity != supportsOpacity {
             colorWell.supportsOpacity = supportsOpacity
         }
